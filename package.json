@@ -1,0 +1,32 @@
+{
+  "name": "@wassist/cli",
+  "version": "0.1.0",
+  "description": "Wassist CLI, manage your WhatsApp agents from the terminal",
+  "type": "module",
+  "bin": {
+    "wassist": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9",
+    "commander": "^13",
+    "conf": "^13"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "tsup": "^8",
+    "tsx": "^4",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "UNLICENSED"
+}
