@@ -1,6 +1,6 @@
 # Wassist CLI
 
-Send and receive WhatsApp messages from your terminal, powered by the official [WhatsApp Business API](https://developers.facebook.com/docs/whatsapp) and powered by [Wassist](https://wassist.app).
+Send and receive WhatsApp messages from your terminal, backed by the official [WhatsApp Business API](https://developers.facebook.com/docs/whatsapp) and make easy [Wassist](https://wassist.app).
 
 ## Installation
 
@@ -18,11 +18,11 @@ Requires Node.js >= 22.
 wassist login
 ```
 
-You'll be prompted to enter your phone number, then a verification code sent via SMS.
+You'll be prompted to enter your phone number, then a verification code sent via WhatsApp.
 
 **2. Send a WhatsApp message to the sandbox**
 
-After logging in you're automatically connected to the Wassist sandbox. Open WhatsApp on your phone and send any message to the sandbox number that send the 2FA code to your phone number.
+After logging in you're automatically connected to the Wassist sandbox. Open WhatsApp on your phone and send any message to the sandbox number that sent the 2FA code to your phone number.
 
 **3. Read your message**
 
@@ -42,7 +42,7 @@ The reply will arrive in your WhatsApp chat.
 
 ## Sending messages
 
-The `messages send` command supports the full WhatsApp unified message format: text, media, buttons, and footers — all composable via flags.
+The `messages send` command supports the full WhatsApp message options: text, media, buttons, and footers — all composable via flags.
 
 ### Text only
 
@@ -103,7 +103,7 @@ wassist messages send "Spring sale is live! " \
 
 If the 24-hour WhatsApp conversation window has expired (no user message in the last 24 hours), the CLI will prompt you to select and send a pre-approved template message instead.
 
-## Using your own number
+## Using a bespoke number & messaging others
 
 The sandbox is great for getting started, but to message real contacts you'll need your own WhatsApp Business number.
 
