@@ -1,6 +1,6 @@
 # Wassist CLI
 
-Send and receive WhatsApp messages from your terminal, backed by the official [WhatsApp Business API](https://developers.facebook.com/docs/whatsapp) and make easy [Wassist](https://wassist.app).
+Send and receive WhatsApp messages from your terminal, backed by the official [WhatsApp Business API](https://developers.facebook.com/docs/whatsapp) and made simple with [Wassist](https://wassist.app).
 
 ## Installation
 
