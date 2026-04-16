@@ -196,3 +196,15 @@ All message commands operate on the currently active number. In sandbox mode, ph
 The CLI stores its config (auth token, active number) locally via [conf](https://github.com/sindresorhus/conf). Run `wassist login` to get started.
 
 The default API backend is `https://backend.wassist.app`. This can be overridden in the config if needed for development.
+
+## WhatsApp policies
+
+By using the Wassist CLI to send messages, you agree to comply with the following policies:
+
+- **WhatsApp Business Policy** -- [https://business.whatsapp.com/policy](https://business.whatsapp.com/policy)
+  Covers opt-in requirements, prohibited content, messaging frequency, and general rules for using the WhatsApp Business Platform.
+
+- **Meta AI Provider pricing policy** -- [https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/ai-providers/](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/ai-providers/)
+  If you are an AI Provider (as defined by Meta's Terms of Service), additional per-message charges apply for non-template messages sent to users in certain countries. Review this page for current rates, affected markets, and effective dates.
+
+It is your responsibility to ensure that all messages sent through the CLI comply with these policies. Violations may result in restrictions on your WhatsApp Business Account or Wassist account.
