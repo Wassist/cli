@@ -1,6 +1,6 @@
 import * as p from '@clack/prompts';
 import { sendCode, verifyCode } from '../lib/api';
-import { saveToken, savePhoneNumber } from '../lib/config';
+import { saveToken, savePhoneNumber, setActiveNumber } from '../lib/config';
 
 export async function login() {   
   p.intro('wassist login');
@@ -59,7 +59,9 @@ export async function login() {
 
     saveToken(res.token);
     savePhoneNumber(phone);
+    setActiveNumber('sandbox');
     s.stop('Verified!');
+    p.log.info('You are using the sandbox number. Use `wassist use <number>` to switch.');
     p.outro('Logged in ✅');
   } catch (err) {
     s.stop('Verification failed.');

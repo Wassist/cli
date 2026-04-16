@@ -1,6 +1,11 @@
 import * as p from '@clack/prompts';
-import { getMe } from '../lib/api';
+import { getMe, getSubscriptionStatus, type SubscriptionLevel } from '../lib/api';
 import { getToken, getPhoneNumber } from '../lib/config';
+
+function formatPlan(level: SubscriptionLevel): string {
+  if (level === 'hobby') return 'Free';
+  return level.charAt(0).toUpperCase() + level.slice(1);
+}
 
 export async function whoami() {
   const token = getToken();
@@ -14,11 +19,13 @@ export async function whoami() {
   s.start('Fetching account info…');
 
   try {
-    const me = await getMe();
+    const [me, sub] = await Promise.all([getMe(), getSubscriptionStatus()]);
     s.stop('Done!');
     p.log.info(`Phone: ${me.phone_number}`);
     p.log.info(`ID:    ${me.id}`);
-  } catch {
+    p.log.info(`Plan:  ${formatPlan(sub.level)}`);
+  } catch (err) {
+    console.log(err);
     s.stop('Failed.');
     const phone = getPhoneNumber();
     if (phone) {

@@ -1,7 +1,7 @@
 {
   "name": "@wassist/cli",
   "version": "0.1.0",
-  "description": "Wassist CLI, manage your WhatsApp agents from the terminal",
+  "description": "Wassist CLI – manage your WhatsApp agents from the terminal",
   "type": "module",
   "bin": {
     "wassist": "./dist/index.js"
@@ -9,8 +9,27 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsup",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wassist/cli.git"
+  },
+  "homepage": "https://github.com/wassist/cli#readme",
+  "bugs": {
+    "url": "https://github.com/wassist/cli/issues"
+  },
+  "keywords": [
+    "whatsapp",
+    "cli",
+    "wassist",
+    "whatsapp-api",
+    "messaging",
+    "chatbot"
+  ],
+  "author": "Wassist",
+  "license": "MIT",
   "dependencies": {
     "@clack/prompts": "^0.9",
     "commander": "^13",
@@ -27,6 +46,5 @@
   },
   "files": [
     "dist"
-  ],
-  "license": "UNLICENSED"
+  ]
 }

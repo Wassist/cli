@@ -4,6 +4,7 @@ interface WassistConfig {
   token?: string;
   apiBase: string;
   phoneNumber?: string;
+  activeNumber?: string;
 }
 
 let _config: Conf<WassistConfig> | undefined;
@@ -44,7 +45,16 @@ export function savePhoneNumber(phone: string): void {
   config().set('phoneNumber', phone);
 }
 
+export function getActiveNumber(): string {
+  return config().get('activeNumber') ?? 'sandbox';
+}
+
+export function setActiveNumber(number: string): void {
+  config().set('activeNumber', number);
+}
+
 export function clearAuth(): void {
   config().delete('token');
   config().delete('phoneNumber');
+  config().delete('activeNumber');
 }
