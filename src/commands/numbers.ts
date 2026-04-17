@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts';
-import { getToken, getActiveNumber, setActiveNumber, getApiBase } from '../lib/config';
+import { getToken, getActiveNumber, setActiveNumber, getFrontendBase } from '../lib/config';
 import {
   listPhoneNumbers,
   listWhatsAppAccounts,
@@ -125,8 +125,7 @@ async function selectOrConnectWaba(): Promise<WhatsAppAccount> {
     return accounts.find((a) => a.id === choice)!;
   }
 
-  const apiBase = getApiBase();
-  const frontendBase = apiBase.replace('backend.', '').replace(/\/$/, '');
+  const frontendBase = getFrontendBase();
   const returnUrl = `${frontendBase}/link-fail`;
   const successUrl = `${frontendBase}/link-complete`;
 
@@ -249,14 +248,13 @@ async function requireStarterOrAbove(): Promise<void> {
     process.exit(0);
   }
 
-  const apiBase = getApiBase();
-  const frontendBase = apiBase.replace('backend.', '').replace(/\/$/, '');
+  const frontendBase = getFrontendBase();
 
   const checkout = await createCheckoutSession('starter', {
     successUrl: `${frontendBase}/upgrade-complete`,
     returnUrl: `${frontendBase}/upgrade-cancelled`,
   });
-  
+
   p.log.info('Opening Stripe checkout in your browser…');
   await openBrowser(checkout.url);
 

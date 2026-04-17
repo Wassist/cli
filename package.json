@@ -8,9 +8,11 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
+    "dev:local": "tsx --env-file=.env.local src/index.ts",
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "push": "cd ../../ && git subtree push --prefix=packages/cli git@github.com:wassist/cli.git main"
   },
   "repository": {
     "type": "git",

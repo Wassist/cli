@@ -351,40 +351,34 @@ export async function listTemplates(): Promise<WhatsAppTemplateLocal[]> {
   return request<WhatsAppTemplateLocal[]>('/api/v1/whatsapp-templates/');
 }
 
-// ── Webhooks ──────────────────────────────────────────────────────────
 
-export interface Webhook {
-  id: string;
-  name: string;
-  url: string;
-  secret: string;
-  type: string;
-  active: boolean;
-  createdAt: string;
+// ── CLI Listen Sessions (WebSocket relay) ─────────────────────────────
+
+export interface ListenSession {
+  sessionId: string;
+  wsUrl: string;
+  token: string;
+  expiresAt: string;
 }
 
-export async function listWebhooks(): Promise<Webhook[]> {
-  return request<Webhook[]>('/api/v1/webhooks/');
-}
-
-export async function createWebhook(name: string, url: string, type: string = 'whatsapp_proxy'): Promise<Webhook> {
-  return request<Webhook>('/api/v1/webhooks/', {
+export async function createListenSession(): Promise<ListenSession> {
+  return request<ListenSession>('/api/v1/cli-listen-sessions/', {
     method: 'POST',
-    body: JSON.stringify({ name, url, type }),
+    body: JSON.stringify({}),
   });
 }
 
-export async function deleteWebhook(id: string): Promise<void> {
+export async function deleteListenSession(sessionId: string): Promise<void> {
   const base = getApiBase();
   const token = getToken();
-  const res = await fetch(`${base}/api/v1/webhooks/${id}/`, {
+  const res = await fetch(`${base}/api/v1/cli-listen-sessions/${sessionId}/`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Token ${token}` } : {}),
     },
   });
-  if (!res.ok) {
+  if (!res.ok && res.status !== 404) {
     throw new ApiError(res.status, `Delete failed (${res.status})`);
   }
 }

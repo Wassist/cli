@@ -5,9 +5,8 @@ import { login } from './commands/login';
 import { whoami } from './commands/whoami';
 import { use } from './commands/use';
 import { numbersList, numbersAdd } from './commands/numbers';
-import { messagesList, messagesRead, messagesSend } from './commands/messages';
+import { messagesList, messagesRead, messagesSend, messagesListen } from './commands/messages';
 import { upgrade } from './commands/upgrade';
-import { webhooksList, webhooksCreate, webhooksDelete } from './commands/webhooks';
 
 const program = new Command();
 
@@ -75,28 +74,15 @@ messages
   .option('--reply <label|id>', 'Quick reply button (max 3, repeatable)', collect, [])
   .action(messagesSend);
 
+messages
+  .command('listen [phone-number]')
+  .description('Stream inbound messages over a WebSocket (no polling)')
+  .option('-i, --interactive', 'Allow replying to the conversation while listening')
+  .action(messagesListen);
+
 program
   .command('upgrade')
   .description('Upgrade your subscription plan')
   .action(upgrade);
-
-const webhooks = program
-  .command('webhooks')
-  .description('Manage your webhooks');
-
-webhooks
-  .command('list')
-  .description('List your webhooks')
-  .action(webhooksList);
-
-webhooks
-  .command('create')
-  .description('Create a new webhook')
-  .action(webhooksCreate);
-
-webhooks
-  .command('delete')
-  .description('Delete a webhook')
-  .action(webhooksDelete);
 
 program.parse();

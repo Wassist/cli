@@ -4,7 +4,7 @@ import {
   createCheckoutSession,
   createPortalSession,
 } from '../lib/api';
-import { getToken, getApiBase } from '../lib/config';
+import { getToken, getFrontendBase } from '../lib/config';
 
 async function openBrowser(url: string) {
   const { exec } = await import('child_process');
@@ -83,8 +83,7 @@ export async function upgrade() {
     process.exit(0);
   }
 
-  const apiBase = getApiBase();
-  const frontendBase = apiBase.replace('backend.', '').replace(/\/$/, '');
+  const frontendBase = getFrontendBase();
   const checkout = await createCheckoutSession(level, {
     successUrl: `${frontendBase}/upgrade-complete`,
     cancelUrl: `${frontendBase}/upgrade-cancelled`,
