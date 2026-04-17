@@ -24,23 +24,21 @@ You'll be prompted to enter your phone number, then a verification code sent via
 
 After logging in you're automatically connected to the Wassist sandbox. Open WhatsApp on your phone and send any message to the sandbox number that sent the 2FA code to your phone number.
 
-**3. Read your message**
+**3. Start an interactive sandbox session**
 
 ```bash
-wassist messages read
+wassist messages listen -i
 ```
 
-You'll see the message you just sent appear in the terminal.
+Inbound messages stream live to your terminal, and you can type replies inline — they'll arrive in your WhatsApp chat.
 
-**4. Send a reply**
-
+Use the flags `--media`, `--url-button`, and `--reply` to send rich messages.
+For example:  
 ```bash
-wassist messages send "hello world"
+wassist messages send "Hello world" --media https://picsum.photos/200/300 --url-button "Shop Now|https://shop.com" --reply "Yes|yes" --reply "No|no"
 ```
 
-The reply will arrive in your WhatsApp chat.
-
-## Sending messages
+## Sending messages non-interactively
 
 The `messages send` command supports the full WhatsApp message options: text, media, buttons, and footers — all composable via flags.
 
