@@ -32,10 +32,11 @@ wassist messages listen -i
 
 Inbound messages stream live to your terminal, and you can type replies inline — they'll arrive in your WhatsApp chat.
 
-Use the flags `--media`, `--url-button`, and `--reply` to send rich messages.
-For example:  
-```bash
-wassist messages send "Hello world" --media https://picsum.photos/200/300 --url-button "Shop Now|https://shop.com" --reply "Yes|yes" --reply "No|no"
+At the `>` prompt, use the flags `--media`, `--url-button`, and `--reply` to send rich messages.
+For example:
+
+```text
+> Hello world --media https://picsum.photos/200/300 --url-button "Shop Now|https://shop.com" --reply "Yes|yes" --reply "No|no"
 ```
 
 ## Sending messages non-interactively
