@@ -252,7 +252,7 @@ async function requireStarterOrAbove(): Promise<void> {
 
   const checkout = await createCheckoutSession('starter', {
     successUrl: `${frontendBase}/upgrade-complete`,
-    returnUrl: `${frontendBase}/upgrade-cancelled`,
+    cancelUrl: `${frontendBase}/upgrade-cancelled`,
   });
 
   p.log.info('Opening Stripe checkout in your browser…');

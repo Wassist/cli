@@ -183,14 +183,14 @@ export async function getSubscriptionStatus(): Promise<SubscriptionStatus> {
 
 export async function createCheckoutSession(
   level: 'starter' | 'pro',
-  opts?: { successUrl?: string; returnUrl?: string },
+  opts?: { successUrl?: string; cancelUrl?: string },
 ): Promise<{ url: string }> {
   return request<{ url: string }>('/api/v1/subscriptions/checkout/', {
     method: 'POST',
     body: JSON.stringify({
       level,
       successUrl: opts?.successUrl ?? null,
-      returnUrl: opts?.returnUrl ?? null,
+      cancelUrl: opts?.cancelUrl ?? null,
     }),
   });
 }
