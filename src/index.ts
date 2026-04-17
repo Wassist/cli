@@ -13,7 +13,7 @@ const program = new Command();
 program
   .name('wassist')
   .description('Wassist CLI – manage your WhatsApp agents from the terminal')
-  .version('0.1.0');
+  .version('0.2.0');
 
 program
   .command('login')

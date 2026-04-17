@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 (2026-04-17)
+
+- `wassist messages listen` — stream inbound messages live over a WebSocket (no polling), with `--interactive` mode to reply inline
+- `wassist messages send` — new flags for rich messaging:
+  - `--footer <text>` — add a footer (max 60 chars)
+  - `--media <url>` — attach image, video, audio, or document
+  - `--url-button <label|url>` — add a URL button
+  - `--reply <label|id>` — add up to 3 quick-reply buttons (repeatable)
+
 ## 0.1.0 (2026-04-15)
 
 Initial release.
@@ -12,5 +21,4 @@ Initial release.
 - `wassist messages list` — list conversations
 - `wassist messages read` — view messages for a contact
 - `wassist messages send` — send a message (with template fallback)
-- `wassist webhooks list/create/delete` — manage webhooks
 - `wassist upgrade` — upgrade your subscription plan

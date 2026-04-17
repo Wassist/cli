@@ -1,6 +1,6 @@
 {
   "name": "@wassist/cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Wassist CLI – manage your WhatsApp agents from the terminal",
   "type": "module",
   "bin": {
@@ -12,7 +12,8 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
-    "push": "cd ../../ && git subtree push --prefix=packages/cli git@github.com:wassist/cli.git main"
+    "push": "cd ../../ && git subtree push --prefix=packages/cli git@github.com:wassist/cli.git main",
+    "publish": "npm publish --access public"
   },
   "repository": {
     "type": "git",
