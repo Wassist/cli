@@ -339,12 +339,23 @@ export async function createConversation(input: CreateConversationInput): Promis
   });
 }
 
+export interface WhatsAppTemplateAccountLink {
+  accountId: string;
+  accountName: string;
+  wabaId: string;
+  metaTemplateId: string | null;
+  status: string;
+  qualityScore: string | null;
+  rejectionReason: string | null;
+}
+
 export interface WhatsAppTemplateLocal {
   id: string;
   name: string;
   category: string;
   language: string;
   components: any[];
+  accountLinks?: WhatsAppTemplateAccountLink[];
 }
 
 export async function listTemplates(): Promise<WhatsAppTemplateLocal[]> {

@@ -7,6 +7,7 @@ import {
   sendMessage,
   createConversation,
   listTemplates,
+  listPhoneNumbers,
   createListenSession,
   deleteListenSession,
   type Conversation,
@@ -14,7 +15,39 @@ import {
   type ConversationListParams,
   type SendUnifiedInput,
   type SendUnifiedButton,
+  type WhatsAppTemplateLocal,
 } from '../lib/api';
+
+const SANDBOX_NUMBER_DISPLAY = '+44 7424 845871';
+
+function sandboxHintMessage(reason: 'sandbox' | 'noTemplates'): string {
+  const intro =
+    reason === 'sandbox'
+      ? 'Templates cannot be sent from the sandbox number.'
+      : `No approved templates are available for +${getActiveNumber()}.`;
+  return (
+    `${intro} To re-open a 24-hour conversation window for testing, send a message ` +
+    `to the sandbox number ${SANDBOX_NUMBER_DISPLAY} from your phone first, then ` +
+    `run \`wassist use sandbox\` and try again.`
+  );
+}
+
+function isActiveNumberSandbox(): boolean {
+  if (isSandbox()) return true;
+  return getActiveNumber() === getSandboxNumber();
+}
+
+function filterTemplatesForActiveNumber(
+  templates: WhatsAppTemplateLocal[],
+  wabaId: string | undefined,
+): WhatsAppTemplateLocal[] {
+  if (!wabaId) return [];
+  return templates.filter((t) =>
+    (t.accountLinks ?? []).some(
+      (link) => link.wabaId === wabaId && link.status === 'APPROVED',
+    ),
+  );
+}
 
 function requireAuth() {
   if (!getToken()) {
@@ -396,6 +429,11 @@ export async function messagesSend(
         'The conversation window has expired (no user message in the last 24 hours). You can only send a template message.',
       );
 
+      if (isActiveNumberSandbox()) {
+        p.log.error(sandboxHintMessage('sandbox'));
+        process.exit(1);
+      }
+
       const sendTemplate = await p.confirm({
         message: 'Would you like to send a template message instead?',
         initialValue: true,
@@ -407,11 +445,19 @@ export async function messagesSend(
       }
 
       s.start('Fetching templates…');
-      const templates = await listTemplates();
+      const [allTemplates, phoneNumbers] = await Promise.all([
+        listTemplates(),
+        listPhoneNumbers(),
+      ]);
       s.stop('');
 
+      const activeNumber = getActiveNumber();
+      const activePhone = phoneNumbers.find((pn) => pn.number === activeNumber);
+      const wabaId = activePhone?.whatsappBusinessAccount?.waId;
+      const templates = filterTemplatesForActiveNumber(allTemplates, wabaId);
+
       if (templates.length === 0) {
-        p.log.error('No templates available. Create a template in the dashboard first.');
+        p.log.error(sandboxHintMessage('noTemplates'));
         process.exit(1);
       }
 
