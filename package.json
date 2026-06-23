@@ -1,6 +1,6 @@
 {
   "name": "@wassist/cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Wassist CLI – manage your WhatsApp agents from the terminal",
   "type": "module",
   "bin": {
