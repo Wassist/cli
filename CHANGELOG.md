@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 (2026-06-23)
+
+- `wassist messages send` — on the sandbox, when the 24-hour conversation window is closed, the CLI no longer prompts to send a template (sandbox doesn't support them). It now tells you to send a WhatsApp to the sandbox number (+44 7424 845871) from your phone to re-open the window.
+
 ## 0.2.1 (2026-06-23)
 
 - `wassist messages send` — when the conversation window has closed and you're prompted to send a template:

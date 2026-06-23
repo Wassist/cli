@@ -21,14 +21,18 @@ import {
 const SANDBOX_NUMBER_DISPLAY = '+44 7424 845871';
 
 function sandboxHintMessage(reason: 'sandbox' | 'noTemplates'): string {
-  const intro =
-    reason === 'sandbox'
-      ? 'Templates cannot be sent from the sandbox number.'
-      : `No approved templates are available for +${getActiveNumber()}.`;
+  if (reason === 'sandbox') {
+    return (
+      `The 24-hour conversation window with the sandbox is closed and templates ` +
+      `cannot be sent from the sandbox number. Send a WhatsApp message to ` +
+      `${SANDBOX_NUMBER_DISPLAY} from your phone to re-open the window, then try again.`
+    );
+  }
   return (
-    `${intro} To re-open a 24-hour conversation window for testing, send a message ` +
-    `to the sandbox number ${SANDBOX_NUMBER_DISPLAY} from your phone first, then ` +
-    `run \`wassist use sandbox\` and try again.`
+    `No approved templates are available for +${getActiveNumber()}. To test ` +
+    `without a template, send a WhatsApp message to the sandbox number ` +
+    `${SANDBOX_NUMBER_DISPLAY} from your phone, then run \`wassist use sandbox\` ` +
+    `and try again.`
   );
 }
 
@@ -425,14 +429,14 @@ export async function messagesSend(
       s.stop('');
       p.log.success(`Message sent to +${conv.contact.phoneNumber}`);
     } else {
-      p.log.warn(
-        'The conversation window has expired (no user message in the last 24 hours). You can only send a template message.',
-      );
-
       if (isActiveNumberSandbox()) {
         p.log.error(sandboxHintMessage('sandbox'));
         process.exit(1);
       }
+
+      p.log.warn(
+        'The conversation window has expired (no user message in the last 24 hours). You can only send a template message.',
+      );
 
       const sendTemplate = await p.confirm({
         message: 'Would you like to send a template message instead?',
