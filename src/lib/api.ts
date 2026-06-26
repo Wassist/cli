@@ -209,6 +209,7 @@ export interface ConversationContact {
 }
 
 export interface ConversationLastMessage {
+  type: string;
   body: string;
   createdAt: string;
   role: 'user' | 'assistant' | 'system';
