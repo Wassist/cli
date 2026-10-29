@@ -556,12 +556,13 @@ interface WebhookEventPayload {
   event: string;
   timestamp: string;
   webhookId: string;
-  phoneNumber: string;
-  from: string;
-  contact: { name: string | null; phoneNumber: string };
+  whatsappNumber: string | null;
+  contact: { name: string | null; phoneNumber: string } | null;
   message: WebhookMessagePayload;
   conversationId: string;
 }
+
+const digitsOnly = (value: string | null | undefined) => (value ?? '').replace(/\D/g, '');
 
 function formatWebhookMessageBody(msg: WebhookMessagePayload): string {
   const lines: string[] = [];
@@ -584,15 +585,16 @@ function shouldDisplayPayload(
   payload: WebhookEventPayload,
   contactFilter: string | undefined,
 ): boolean {
+  const from = digitsOnly(payload.contact?.phoneNumber);
   if (isSandbox()) {
     const pn = getPhoneNumber();
     if (!pn) return true;
-    return payload.from === pn;
+    return from === digitsOnly(pn);
   }
 
   const active = getActiveNumber();
-  if (payload.phoneNumber !== active) return false;
-  if (contactFilter && payload.from !== contactFilter) return false;
+  if (digitsOnly(payload.whatsappNumber) !== digitsOnly(active)) return false;
+  if (contactFilter && from !== digitsOnly(contactFilter)) return false;
   return true;
 }
 
@@ -880,7 +882,7 @@ export async function messagesListen(
 
       const time = formatTimestamp(payload.timestamp);
       const contactName = payload.contact?.name;
-      const label = `+${payload.from}${contactName ? ` (${contactName})` : ''}`;
+      const label = `+${digitsOnly(payload.contact?.phoneNumber)}${contactName ? ` (${contactName})` : ''}`;
       const body = formatWebhookMessageBody(payload.message);
       writeAbovePrompt(`  [${time}] ${label}\n    ${body}`);
     });
