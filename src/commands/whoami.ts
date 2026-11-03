@@ -1,6 +1,6 @@
 import * as p from '@clack/prompts';
-import { getMe, getSubscriptionStatus, type SubscriptionLevel } from '../lib/api';
-import { getToken, getPhoneNumber } from '../lib/config';
+import { getMe, getSubscriptionStatus, listOrganizations, type SubscriptionLevel } from '../lib/api';
+import { getToken, getPhoneNumber, getOrganization } from '../lib/config';
 
 function formatPlan(level: SubscriptionLevel): string {
   if (level === 'hobby') return 'Free';
@@ -19,10 +19,13 @@ export async function whoami() {
   s.start('Fetching account info…');
 
   try {
-    const [me, sub] = await Promise.all([getMe(), getSubscriptionStatus()]);
+    const [me, sub, orgs] = await Promise.all([getMe(), getSubscriptionStatus(), listOrganizations()]);
     s.stop('Done!');
+    const activeId = getOrganization()?.id;
+    const org = orgs.find((o) => (activeId ? o.id === activeId : o.isPersonal));
     p.log.info(`Phone: ${me.phone_number}`);
     p.log.info(`ID:    ${me.id}`);
+    p.log.info(`Org:   ${org ? `${org.name}${org.isPersonal ? ' (personal)' : ''}` : activeId ?? 'personal'}`);
     p.log.info(`Plan:  ${formatPlan(sub.level)}`);
   } catch (err) {
     console.log(err);

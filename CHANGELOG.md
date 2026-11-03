@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 (2026-11-03)
+
+- `wassist orgs list` and `wassist orgs use <org>` switch which organization the CLI acts in (by id, slug, name or `personal`). Requests send `X-Organization-Id`, and `wassist whoami` shows the active organization. Logging in resets to your personal organization.
+- Your sandbox chat works the same in every organization: `messages list`, `read`, `send` and `listen` on the sandbox reach your own chat whichever organization is active.
+- The sandbox number is looked up from the API instead of being hardcoded. `wassist use <sandbox number>` picks which sandbox to use when there's more than one.
+- `wassist numbers list` no longer shows the sandbox twice, and shows where each number routes (agent or webhook).
+- API errors show the server's message instead of a generic "Request failed".
+
 ## 0.2.2 (2026-06-23)
 
 - `wassist messages send` — on the sandbox, when the 24-hour conversation window is closed, the CLI no longer prompts to send a template (sandbox doesn't support them). It now tells you to send a WhatsApp to the sandbox number (+44 7424 845871) from your phone to re-open the window.

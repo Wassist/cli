@@ -7,13 +7,14 @@ import { use } from './commands/use';
 import { numbersList, numbersAdd } from './commands/numbers';
 import { messagesList, messagesRead, messagesSend, messagesListen } from './commands/messages';
 import { upgrade } from './commands/upgrade';
+import { orgsList, orgsUse } from './commands/orgs';
 
 const program = new Command();
 
 program
   .name('wassist')
   .description('Wassist CLI – manage your WhatsApp agents from the terminal')
-  .version('0.2.0');
+  .version('0.3.0');
 
 program
   .command('login')
@@ -29,6 +30,20 @@ program
   .command('use <number>')
   .description('Set the active number for the current session')
   .action(use);
+
+const orgs = program
+  .command('orgs')
+  .description('Switch between the organizations you belong to');
+
+orgs
+  .command('list')
+  .description('List your organizations')
+  .action(orgsList);
+
+orgs
+  .command('use <org>')
+  .description('Act in an organization (id, name, or "personal")')
+  .action(orgsUse);
 
 const numbers = program
   .command('numbers')

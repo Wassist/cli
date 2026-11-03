@@ -5,6 +5,9 @@ interface WassistConfig {
   apiBase: string;
   phoneNumber?: string;
   activeNumber?: string;
+  sandboxNumber?: string;
+  organizationId?: string;
+  organizationName?: string;
 }
 
 let _config: Conf<WassistConfig> | undefined;
@@ -55,8 +58,14 @@ export function getFrontendBase(): string {
   return getApiBase().replace('backend.', '').replace(/\/$/, '');
 }
 
-export function getSandboxNumber(): string {
-  return process.env.WASSIST_SANDBOX_NUMBER ?? '447424845871';
+/** The sandbox number you picked with `wassist use`, or the env override. */
+export function getPreferredSandboxNumber(): string | undefined {
+  return process.env.WASSIST_SANDBOX_NUMBER?.replace(/^\+/, '') || config().get('sandboxNumber');
+}
+
+export function setPreferredSandboxNumber(number: string | null): void {
+  if (number) config().set('sandboxNumber', number);
+  else config().delete('sandboxNumber');
 }
 
 export function getPhoneNumber(): string | undefined {
@@ -75,8 +84,28 @@ export function setActiveNumber(number: string): void {
   config().set('activeNumber', number);
 }
 
+/** The organization requests act in; unset means your personal organization. */
+export function getOrganization(): { id: string; name?: string } | undefined {
+  const id = process.env.WASSIST_ORGANIZATION_ID ?? config().get('organizationId');
+  if (!id) return undefined;
+  return { id, name: process.env.WASSIST_ORGANIZATION_ID ? undefined : config().get('organizationName') };
+}
+
+export function setOrganization(org: { id: string; name: string } | null): void {
+  if (org) {
+    config().set('organizationId', org.id);
+    config().set('organizationName', org.name);
+  } else {
+    config().delete('organizationId');
+    config().delete('organizationName');
+  }
+}
+
 export function clearAuth(): void {
   config().delete('token');
   config().delete('phoneNumber');
   config().delete('activeNumber');
+  config().delete('sandboxNumber');
+  config().delete('organizationId');
+  config().delete('organizationName');
 }

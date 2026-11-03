@@ -1,7 +1,8 @@
 import * as p from '@clack/prompts';
 import * as readline from 'node:readline';
-import { getToken, getActiveNumber, getPhoneNumber, getSandboxNumber } from '../lib/config';
+import { getToken, getActiveNumber, getPhoneNumber } from '../lib/config';
 import {
+  resolveSandboxNumber,
   listConversations,
   getConversationMessages,
   sendMessage,
@@ -18,27 +19,27 @@ import {
   type WhatsAppTemplateLocal,
 } from '../lib/api';
 
-const SANDBOX_NUMBER_DISPLAY = '+44 7424 845871';
-
-function sandboxHintMessage(reason: 'sandbox' | 'noTemplates'): string {
+async function sandboxHintMessage(reason: 'sandbox' | 'noTemplates'): Promise<string> {
+  const sandbox = await resolveSandboxNumber().then((n) => `+${n}`, () => 'the sandbox number');
   if (reason === 'sandbox') {
     return (
       `The 24-hour conversation window with the sandbox is closed and templates ` +
       `cannot be sent from the sandbox number. Send a WhatsApp message to ` +
-      `${SANDBOX_NUMBER_DISPLAY} from your phone to re-open the window, then try again.`
+      `${sandbox} from your phone to re-open the window, then try again.`
     );
   }
   return (
     `No approved templates are available for +${getActiveNumber()}. To test ` +
     `without a template, send a WhatsApp message to the sandbox number ` +
-    `${SANDBOX_NUMBER_DISPLAY} from your phone, then run \`wassist use sandbox\` ` +
+    `${sandbox} from your phone, then run \`wassist use sandbox\` ` +
     `and try again.`
   );
 }
 
-function isActiveNumberSandbox(): boolean {
+async function isActiveNumberSandbox(): Promise<boolean> {
   if (isSandbox()) return true;
-  return getActiveNumber() === getSandboxNumber();
+  const numbers = await listPhoneNumbers();
+  return numbers.some((n) => n.number === getActiveNumber() && n.isSandbox);
 }
 
 function filterTemplatesForActiveNumber(
@@ -111,7 +112,8 @@ async function resolveConversation(contactNumber?: string): Promise<Conversation
 
   const params: ConversationListParams = {};
   if (isSandbox()) {
-    params.whatsappNumber = getSandboxNumber();
+    // The API only returns your own chat on a sandbox number, in any org.
+    params.whatsappNumber = await resolveSandboxNumber();
   } else {
     params.whatsappNumber = activeNumber;
   }
@@ -144,8 +146,7 @@ export async function messagesList() {
     const activeNumber = getActiveNumber();
     const params: ConversationListParams = {};
     if (isSandbox()) {
-      params.whatsappNumber = getSandboxNumber();
-      params.contact = getPhoneNumber() ?? '';
+      params.whatsappNumber = await resolveSandboxNumber();
     } else {
       params.whatsappNumber = activeNumber;
     }
@@ -429,8 +430,8 @@ export async function messagesSend(
       s.stop('');
       p.log.success(`Message sent to +${conv.contact.phoneNumber}`);
     } else {
-      if (isActiveNumberSandbox()) {
-        p.log.error(sandboxHintMessage('sandbox'));
+      if (await isActiveNumberSandbox()) {
+        p.log.error(await sandboxHintMessage('sandbox'));
         process.exit(1);
       }
 
@@ -461,7 +462,7 @@ export async function messagesSend(
       const templates = filterTemplatesForActiveNumber(allTemplates, wabaId);
 
       if (templates.length === 0) {
-        p.log.error(sandboxHintMessage('noTemplates'));
+        p.log.error(await sandboxHintMessage('noTemplates'));
         process.exit(1);
       }
 

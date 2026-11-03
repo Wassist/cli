@@ -151,14 +151,23 @@ wassist use sandbox
 | Command | Description |
 |---------|-------------|
 | `wassist login` | Authenticate with your phone number via OTP |
-| `wassist whoami` | Show the currently authenticated user and plan |
+| `wassist whoami` | Show the currently authenticated user, active organization and plan |
+
+### Organizations
+
+The CLI starts in your personal organization. Switch to a team to use its numbers, agents and webhooks. Your sandbox chat is yours, so it's the same chat in every organization.
+
+| Command | Description |
+|---------|-------------|
+| `wassist orgs list` | List the organizations you belong to, showing which is active |
+| `wassist orgs use <org>` | Act in an organization, by id, slug, name, or `personal` |
 
 ### Number management
 
 | Command | Description |
 |---------|-------------|
-| `wassist use <number>` | Set the active number for the current session. Use `sandbox` to switch back to the sandbox number |
-| `wassist numbers list` | List all your WhatsApp numbers, showing which is active |
+| `wassist use <number>` | Set the active number for the current session. Use `sandbox` (or a sandbox number) to switch back to your sandbox chat |
+| `wassist numbers list` | List the active organization's numbers and the sandbox numbers, with where each routes and which is active |
 | `wassist numbers add` | Add a new WhatsApp number (requires Starter plan or above) |
 
 ### Messaging
@@ -192,7 +201,7 @@ All message commands operate on the currently active number. In sandbox mode, ph
 
 ## Configuration
 
-The CLI stores its config (auth token, active number) locally via [conf](https://github.com/sindresorhus/conf). Run `wassist login` to get started.
+The CLI stores its config (auth token, active organization, active number) locally via [conf](https://github.com/sindresorhus/conf). Run `wassist login` to get started. `WASSIST_ORGANIZATION_ID` and `WASSIST_SANDBOX_NUMBER` override the active organization and sandbox number for a single command.
 
 The default API backend is `https://backend.wassist.app`. This can be overridden in the config if needed for development.
 

@@ -1,6 +1,6 @@
 import * as p from '@clack/prompts';
 import { listPhoneNumbers } from '../lib/api';
-import { getToken, setActiveNumber } from '../lib/config';
+import { getToken, setActiveNumber, setPreferredSandboxNumber } from '../lib/config';
 
 export async function use(number: string) {
   const token = getToken();
@@ -29,9 +29,16 @@ export async function use(number: string) {
     if (!match) {
       s.stop('Number not found.');
       p.log.error(
-        `Number ${number} is not on your account. Run \`wassist numbers list\` to see your numbers.`,
+        `Number ${number} is not in this organization. Run \`wassist numbers list\` to see your numbers, or \`wassist orgs use\` to switch organization.`,
       );
       process.exit(1);
+    }
+
+    if (match.isSandbox) {
+      setPreferredSandboxNumber(match.number);
+      setActiveNumber('sandbox');
+      s.stop(`Switched to sandbox +${match.number}`);
+      return;
     }
 
     setActiveNumber(match.number);

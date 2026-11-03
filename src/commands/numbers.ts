@@ -1,5 +1,11 @@
 import * as p from '@clack/prompts';
-import { getToken, getActiveNumber, setActiveNumber, getFrontendBase } from '../lib/config';
+import {
+  getToken,
+  getActiveNumber,
+  setActiveNumber,
+  getFrontendBase,
+  getPreferredSandboxNumber,
+} from '../lib/config';
 import {
   listPhoneNumbers,
   listWhatsAppAccounts,
@@ -35,27 +41,39 @@ export async function numbersList() {
 
     const rows: string[] = [];
 
-    const sandboxLabel = active === 'sandbox' ? 'sandbox (active)' : 'sandbox';
-    rows.push(`  ${sandboxLabel}`);
+    // Sandboxes first. Their routing is your own chat's, in any organization.
+    const sorted = [...numbers].sort((a, b) => Number(b.isSandbox) - Number(a.isSandbox));
+    const preferred = getPreferredSandboxNumber();
+    const activeSandbox =
+      sorted.find((n) => n.isSandbox && n.number === preferred) ??
+      sorted.find((n) => n.isSandbox && n.defaultRouting) ??
+      sorted.find((n) => n.isSandbox);
 
-    for (const num of numbers) {
+    for (const num of sorted) {
       const parts: string[] = [`+${num.number}`];
 
-      if (num.whatsappBusinessAccount?.name) {
+      if (num.isSandbox) {
+        parts.push('sandbox');
+      } else if (num.whatsappBusinessAccount?.name) {
         parts.push(num.whatsappBusinessAccount.name);
       }
 
-      if (num.activeAgent) {
-        parts.push('(wassist agent attached)');
+      if (num.defaultRouting === 'agent' && num.activeAgent) {
+        parts.push(`→ agent ${num.activeAgent.name}`);
+      } else if (num.defaultRouting === 'webhook' && num.defaultWebhook) {
+        parts.push(`→ webhook ${num.defaultWebhook.name}`);
+      } else if (num.defaultRouting) {
+        parts.push(`→ ${num.defaultRouting}`);
       }
 
-      if (active === num.number) {
+      if (active === num.number || (active === 'sandbox' && num === activeSandbox)) {
         parts.push('(active)');
       }
 
       rows.push(`  ${parts.join('  ')}`);
     }
 
+    if (rows.length === 0) rows.push('  No numbers yet. Run `wassist numbers add` to connect one.');
     p.log.message(rows.join('\n'));
   } catch (err) {
     s.stop('Failed.');

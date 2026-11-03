@@ -1,4 +1,4 @@
-import { getApiBase, getToken } from './config';
+import { getApiBase, getOrganization, getPreferredSandboxNumber, getToken } from './config';
 
 interface SendCodeResponse {
   success: boolean;
@@ -40,6 +40,19 @@ export interface PhoneNumber {
   whatsappPhoneNumberId: string;
   whatsappBusinessAccount: PhoneNumberWaba | null;
   activeAgent: PhoneNumberAgent | null;
+  defaultRouting: 'agent' | 'webhook' | 'support' | null;
+  defaultWebhook: { id: string; name: string; url: string } | null;
+  /** Shared Wassist number; its routing fields describe your own chat with it. */
+  isSandbox: boolean;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  isPersonal: boolean;
+  subscriptionLevel: string;
+  role: 'owner' | 'admin' | 'member' | null;
 }
 
 export interface WhatsAppAccount {
@@ -80,6 +93,15 @@ class ApiError extends Error {
   }
 }
 
+function authHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {};
+  const token = getToken();
+  if (token) headers['Authorization'] = `Token ${token}`;
+  const org = getOrganization();
+  if (org) headers['X-Organization-Id'] = org.id;
+  return headers;
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
@@ -89,19 +111,19 @@ async function request<T>(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    ...authHeaders(),
     ...((options.headers as Record<string, string>) ?? {}),
   };
 
-  const token = getToken();
-  if (token) {
-    headers['Authorization'] = `Token ${token}`;
-  }
-
   const res = await fetch(url, { ...options, headers });
-  const body = await res.json() as T & { message?: string };
+  const body = await res.json().catch(() => ({})) as T & { message?: string; detail?: string; error?: string };
 
   if (!res.ok) {
-    throw new ApiError(res.status, body.message ?? `Request failed (${res.status})`);
+    let message = body.message ?? body.detail ?? body.error ?? `Request failed (${res.status})`;
+    if (res.status === 403 && getOrganization() && /not a member of this organization/i.test(message)) {
+      message += ' Run `wassist orgs use personal` or pick another with `wassist orgs list`.';
+    }
+    throw new ApiError(res.status, message);
   }
 
   return body;
@@ -127,6 +149,24 @@ export async function getMe(): Promise<GetMeResponse> {
 
 export async function listPhoneNumbers(): Promise<PhoneNumber[]> {
   return request<PhoneNumber[]>('/api/v1/phone-numbers/');
+}
+
+/**
+ * The sandbox number to use: `WASSIST_SANDBOX_NUMBER` or the one picked with
+ * `wassist use`, else the sandbox you have routed, else the first one.
+ */
+export async function resolveSandboxNumber(): Promise<string> {
+  const preferred = getPreferredSandboxNumber();
+  if (preferred && process.env.WASSIST_SANDBOX_NUMBER) return preferred;
+  const sandboxes = (await listPhoneNumbers()).filter((n) => n.isSandbox);
+  if (preferred && sandboxes.some((n) => n.number === preferred)) return preferred;
+  const sandbox = sandboxes.find((n) => n.defaultRouting) ?? sandboxes[0];
+  if (!sandbox) throw new Error('No sandbox number is available right now. Try again later.');
+  return sandbox.number;
+}
+
+export async function listOrganizations(): Promise<Organization[]> {
+  return request<Organization[]>('/api/v1/organizations/');
 }
 
 export async function listWhatsAppAccounts(): Promise<WhatsAppAccount[]> {
@@ -382,12 +422,11 @@ export async function createListenSession(): Promise<ListenSession> {
 
 export async function deleteListenSession(sessionId: string): Promise<void> {
   const base = getApiBase();
-  const token = getToken();
   const res = await fetch(`${base}/api/v1/cli-listen-sessions/${sessionId}/`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Token ${token}` } : {}),
+      ...authHeaders(),
     },
   });
   if (!res.ok && res.status !== 404) {
